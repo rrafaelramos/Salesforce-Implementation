@@ -1,4 +1,5 @@
 import { LightningElement, api, track, wire } from 'lwc';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { getPicklistValues } from 'lightning/uiObjectInfoApi';
 import { getObjectInfo } from 'lightning/uiObjectInfoApi';
 
@@ -8,6 +9,8 @@ import updateAccount from '@salesforce/apex/AccountController.updateAccount';
 import ACCOUNT_OBJECT from '@salesforce/schema/Account';
 import ACCOUNT_TYPE from '@salesforce/schema/Account.Type';
 
+const INVALID_ACCOUNT_NUMBER = 'Número do cliente é inválido';
+const SUCCESS_MESSAGE = 'Conta atualizada com sucesso!';
 const DEFAULT_PLACEHOLDER = 'Selecione uma opção';
 const DOCUMENT_OPTIONS = ['CPF','CNPJ'];
 const CPF = 'CPF';
@@ -31,11 +34,10 @@ export default class AccountUpdate extends LightningElement{
     wiredAccountInformation({ error, data }){
 
         if( data ){
-            console.log( JSON.stringify( data ));
+
             this.account = {...data};
-
             this.typeValue = data.Type;
-
+            this.isDocumentType = DOCUMENT_OPTIONS.includes( data.Type );
         }
 
         if( error ){
@@ -133,18 +135,45 @@ export default class AccountUpdate extends LightningElement{
 
         updateAccount( parameters ).then( result => {
 
-            console.log( 'sucesso');
+            this.showToast('Sucesso' , SUCCESS_MESSAGE, 'success' );
+
+            this.isLoading = false;
 
         }).catch( error => {
-            console.error( error );
+            console.error( JSON.stringify(error) );
             this.isLoading = false;
+
+            if( error.body.message.includes( INVALID_ACCOUNT_NUMBER ) ){
+            
+                this.showToast( 'Erro', INVALID_ACCOUNT_NUMBER, 'error' );
+                return;
+            }
+
+            this.showToast( 'Erro:', this.buildErrorMessage( error ), 'error' );
         });
 
     }
 
     invalidFieldsToUpdate( ){
-
         return !this.newName && (!this.typeValue || this.typeValue === DEFAULT_PLACEHOLDER );        
+    }
+
+    showToast(title, message, variant) {
+
+        const evtent = new ShowToastEvent({
+            title: title,
+            message: message,
+            variant: variant,
+        });
+
+        this.dispatchEvent(evtent);
+    }
+
+    buildErrorMessage(error) {
+        if (error.status)
+            return `${error.status} (${error.statusText}) ${error.body ? '- ' + error.body.message : ''}.`
+
+        return `${error.body ? '- ' + error.body.message : ''}`;
     }
 
 }
