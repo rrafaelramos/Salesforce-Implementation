@@ -5,7 +5,7 @@
     
     public List<Account> findByIds( Set<String> accountIds ){
 
-        return [ SELECT Id, AccountNumber, Name, Type
+        return [ SELECT Id, AccountNumber, Name, Type, RecordType.Name
                  FROM Account
                  WHERE Id in: accountIds ];
 

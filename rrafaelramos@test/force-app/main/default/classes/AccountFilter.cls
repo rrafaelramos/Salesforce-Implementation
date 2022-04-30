@@ -22,4 +22,24 @@ public class AccountFilter {
         return filteredAccounts;
     }
 
+    public List<Account> byRecordTypeName( List<account> accounts, String recordType ){
+
+        List<Account> filteredAccounts = new List<Account>();
+
+        Map<ID, Schema.RecordTypeInfo> recordTypeOfAccount = Schema.SObjectType.Account.getRecordTypeInfosById();
+
+        for( Account account : accounts ){
+
+            String recordTypeName = recordTypeOfAccount.get( account.RecordTypeId ).getName();
+
+            if( recordTypeName == null || String.isEmpty( recordTypeName ) ) continue;
+
+            if( recordTypeName != recordType ) continue;
+
+            filteredAccounts.add( account );
+        }
+
+        return filteredAccounts;
+    }
+
 }

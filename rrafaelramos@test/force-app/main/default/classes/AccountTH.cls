@@ -43,4 +43,11 @@ public class AccountTH extends TriggerHandler {
 
     }
 
+    override
+    public void afterInsert() {
+
+        this.service.verifyAndCreateOpportunityForPartnerAccount( this.newAccounts );
+        //this.service.verifyAndCreateTaskForFinalCustomer( this.newAccounts );
+    }
+
 }
