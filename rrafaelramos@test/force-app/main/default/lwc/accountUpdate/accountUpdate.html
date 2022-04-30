@@ -1,0 +1,31 @@
+<template>
+
+    <lightning-card title="Informações da Conta" icon-name="custom:custom14">
+        <div class="slds-var-m-around_medium">
+
+            <lightning-input 
+                label="Nome:" 
+                onchange={handleNameChange}
+                placeholder={account.Name}>
+            </lightning-input>
+
+            <lightning-combobox label="Tipo:" 
+                options={typePicklist}
+                onchange={handleTypeChange}
+                value={typeValue} > 
+            </lightning-combobox>
+
+            <lightning-input if:true={isDocumentType}
+                label={typeValue}
+                onchange={handleAccountNumberChange}> 
+            </lightning-input>
+
+        </div>
+
+        <div>
+            <lightning-button variant="brand" label="Salvar" onclick={handleUpdateAccount}></lightning-button>
+        </div>
+
+    </lightning-card>
+
+</template>
