@@ -10,19 +10,17 @@ public class AccountTHTest {
     public static final String FINAL_CUSTOMER = 'Consumidor Final';
 
     @isTest
-    public static void givenAAccountWithValidCpfThenAccountIsCreated(  ){
+    public static void givenAccountListWithValidsCpfThenAccountIsCreated(  ){
 
         AccountRepository repository = new AccountRepository();
 
-        Account account = AccountFixtureFactory.newPartnerAccount();
-        account.Type = 'CPF';
-        account.AccountNumber = '12345678911';
+        List<Account> accounts = AccountFixtureFactory.newFinalCustomerAccountList();
 
         Test.startTest();
-        Account storagedAccount = ( Account ) repository.save( account );
+        List<Account> storagedAccounts = ( List<Account> ) repository.upsertObjects( accounts );
         Test.stopTest();
 
-        System.assertEquals( true, String.isNotEmpty( account.Id ) );
+        System.assertEquals( true, String.isNotEmpty( accounts.get(0).Id ) );
     }
 
     @isTest
@@ -36,13 +34,59 @@ public class AccountTHTest {
 
         Boolean hasError = false;
 
-        try {
-            Account storagedAccount = ( Account ) repository.save( account );
-        } catch( Exception e ){
-            if (e.getMessage().contains( INVALID_ACCOUNT_NUMBER ) ) hasError = true;
-        }
+        Test.startTest();
 
-        System.assert( hasError );
+        List<Account> storagedAccounts = ( List<Account> ) repository.upsertObjects( new List<Account> {account} );
+
+        Test.stopTest();
+
+        System.assert( storagedAccounts.isEmpty() );
+    }
+
+    @isTest
+    public static void givenAccountListWithPartnerAccountsThenOpportunitiesShouldBeCreated( ){
+
+        AccountRepository repository = new AccountRepository();
+        OpportunityRepository opportunityRepository = new OpportunityRepository();
+
+        List<Account> accounts = AccountFixtureFactory.newPartnerAccountList();
+
+        List<Account> storagedAccounts = ( List<Account> ) repository.upsertObjects( accounts );
+        
+        Set<String> accountIds = new Set<String>();
+
+        for( Account account : storagedAccounts ) accountIds.add( account.Id );
+
+        Test.startTest();
+        List<Opportunity> opportunities = opportunityRepository.findByAccountsId( accountIds );
+        Test.stopTest();
+
+        System.assertEquals( true, !opportunities.isEmpty() );
+        System.assertEquals( 2, opportunities.size() );
+
+    }
+
+    @isTest
+    public static void givenAccountListWithFinalCustomersThenOpportunitiesShouldBeCreated( ){
+
+        AccountRepository repository = new AccountRepository();
+        TaskRepository taskRepository = new TaskRepository();
+
+        List<Account> accounts = AccountFixtureFactory.newFinalCustomerAccountList();
+
+        List<Account> storagedAccounts = ( List<Account> ) repository.upsertObjects( accounts );
+        
+        Set<String> accountIds = new Set<String>();
+
+        for( Account account : storagedAccounts ) accountIds.add( account.Id );
+
+        Test.startTest();
+        List<Task> tasks = taskRepository.findByAccountsId( accountIds );
+        Test.stopTest();
+
+        System.assertEquals( true, !tasks.isEmpty() );
+        System.assertEquals( 2, tasks.size() );
+
     }
 
     @isTest

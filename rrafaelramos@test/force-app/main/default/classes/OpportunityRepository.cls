@@ -27,4 +27,13 @@ public class OpportunityRepository extends AbstractRepository{
         return opportunities != null && !opportunities.isEmpty() ? opportunities.get(0) : null;
     }
 
+    public List<Opportunity> findByAccountsId ( Set<String> accountsId ){
+
+        List<Opportunity> opportunities = [ SELECT Id, Name, CloseDate, StageName, AccountId
+                 FROM Opportunity
+                 WHERE AccountId in :accountsId ];
+
+        return opportunities;
+    }
+
 }

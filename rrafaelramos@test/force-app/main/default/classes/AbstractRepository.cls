@@ -4,17 +4,34 @@
 public abstract class AbstractRepository {
 
     virtual
-    public SObject save (SObject aggregate) {
+    public SObject save (SObject abstractObject) {
 
-        if (aggregate == null) return null;
+        if (abstractObject == null) return null;
 
-        if (aggregate.Id == null ) {
-            insert aggregate;
+        if (abstractObject.Id == null ) {
+            insert abstractObject;
         } else {
-            update aggregate;
+            update abstractObject;
         }
 
-        return aggregate;
+        return abstractObject;
+    }
+
+    virtual
+    public List<SObject> upsertObjects (List<SObject> objects) {
+
+        try{
+
+            upsert objects;
+
+        }  catch (Exception ex) {
+
+            System.debug( ex.getMessage() );
+
+            return new List<SObject>();
+        }
+
+        return objects;
     }
 
 }

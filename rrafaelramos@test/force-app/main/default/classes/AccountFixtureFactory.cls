@@ -23,6 +23,14 @@ public class AccountFixtureFactory {
             );
     }
 
+    public static List<Account> newFinalCustomerAccountList(){
+        return ( List<Account> ) JSON.deserialize( getFinalCustomerPayload(), List<Account>.class );
+    }
+
+    public static List<Account> newPartnerAccountList(){
+        return ( List<Account> ) JSON.deserialize( getPartnerPayload(), List<Account>.class );
+    }
+
     public static Account createPartnerAccount( ){
         return createAccount( newPartnerAccount() );
     }
@@ -38,6 +46,26 @@ public class AccountFixtureFactory {
     public static Account createAccount( Account account ) {
         insert account;
         return account;
+    }
+
+    private static String getFinalCustomerPayload( ){
+
+        return '[{"RecordTypeId":"' 
+                + RECORDTYPE_FINAL_CUSTOMER
+                + '","Name":"Parceiro1","Type":"CPF","AccountNumber":"12345678911"},'
+                +'{"RecordTypeId":"' 
+                + RECORDTYPE_FINAL_CUSTOMER +
+                '","Name":"Parceiro2","Type":"CPF","AccountNumber":"11987654321"}]';
+    }
+
+    private static String getPartnerPayload( ){
+
+        return '[{"RecordTypeId":"' 
+                + RECORDTYPE_PARTNER
+                + '","Name":"Parceiro1","Type":"CPF","AccountNumber":"12345678911"},'
+                +'{"RecordTypeId":"' 
+                + RECORDTYPE_PARTNER +
+                '","Name":"Parceiro2","Type":"CPF","AccountNumber":"11987654321"}]';
     }
 
 }

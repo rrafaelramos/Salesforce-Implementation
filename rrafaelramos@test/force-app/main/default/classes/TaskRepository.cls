@@ -27,5 +27,14 @@ public class TaskRepository {
         return tasks != null && !tasks.isEmpty() ? tasks.get(0) : null;
     }
 
+    public List<Task> findByAccountsId ( Set<String> accountsId ){
+
+        List<Task> tasks = [ SELECT Id, WhatId, Subject, Status, Priority
+                 FROM Task
+                 WHERE WhatId in :accountsId ];
+
+        return tasks;
+    }
+
 }
 
