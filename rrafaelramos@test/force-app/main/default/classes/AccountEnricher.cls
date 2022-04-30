@@ -12,4 +12,15 @@ public class AccountEnricher {
         return account;
     }
 
+    public List<Account> withInactiveField( List<Account> accounts, Boolean inactive ){
+
+        for( Account account : accounts ){
+
+            account.Inactive__c = inactive;
+
+        }
+
+        return accounts;
+    }
+
 }

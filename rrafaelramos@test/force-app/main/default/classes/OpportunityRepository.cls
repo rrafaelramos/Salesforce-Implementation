@@ -20,9 +20,7 @@ public class OpportunityRepository extends AbstractRepository{
 
     public Opportunity findOneByAccountId( String accountId ){
 
-        List<Opportunity> opportunities = [ SELECT Id, Name, CloseDate, StageName, AccountId
-                 FROM Opportunity
-                 WHERE AccountId = :accountId ];
+        List<Opportunity> opportunities = findByAccountsId( new Set<String>{ accountId });
 
         return opportunities != null && !opportunities.isEmpty() ? opportunities.get(0) : null;
     }

@@ -8,6 +8,8 @@ public class AccountService {
     public AccountRepository repository;
     public OpportunityService opportunityService;
     public TaskService taskService;
+    public TaskRepository taskRepository;
+    public OpportunityRepository opportunityRepository;
 
     public AccountService(){
         this.filter = new AccountFilter();
@@ -15,6 +17,8 @@ public class AccountService {
         this.repository = new AccountRepository();
         this.opportunityService = new OpportunityService();
         this.taskService = new TaskService();
+        this.taskRepository = new TaskRepository();
+        this.opportunityRepository = new OpportunityRepository();
     }
 
     private static final String CPF = 'CPF';
@@ -95,4 +99,71 @@ public class AccountService {
         taskService.createTaskForFinalCustomer( finalCustomerAccounts );
     }
 
+    public List<Account> getInactiveAccounts( List<Account> accounts ){
+
+        Set<String> accountsId = new Set<String>();
+
+        for ( Account account : accounts ) accountsId.add( account.Id );
+
+        List<Task> tasks = taskRepository.findByAccountsId( accountsId );
+
+        Map<String, Task> taskByAccountId = mapTaskByAccountId( tasks );
+
+        Set<String> accountsWithoutTasks = getAccountsIdWithoutTasks( accounts, taskByAccountId, accountsId );
+
+        List<Opportunity> opportunities = opportunityRepository.findByAccountsId( accountsWithoutTasks );
+
+        Set<String> accountsIdToInactivate = getAccountIdsWithoutOppLastFourMonths( opportunities, accountsWithoutTasks );
+
+        List<Account> toInactivateAccounts = repository.findByIds( accountsIdToInactivate );
+
+        return toInactivateAccounts;
+    }
+
+    public Map<String, Task> mapTaskByAccountId( List<Task> tasks ){
+        
+        if( tasks == null || tasks.isEmpty() ) return new Map<String, Task>();
+
+        Map<String, Task> taskByAccountId = new Map<String, Task>();
+        
+        for( Task task : tasks ) taskByAccountId.put( task.WhatId , task );
+        
+        return taskByAccountId;
+    }
+    
+    public Set<String> getAccountsIdWithoutTasks( List<Account> accounts,  Map<String, Task> taskByAccountId, Set<String> accountsId ){
+
+        if( taskByAccountId.isEmpty() == null || taskByAccountId.isEmpty() ) return accountsId;
+
+        for( Account account : accounts ){
+            
+            Task mappedTask = taskByAccountId.get( account.Id );
+            
+            if( mappedTask == null ) continue;
+            
+            Date lastThreeMonths = System.now().date().addDays( -90 );
+            
+            if( mappedTask.CreatedDate > lastThreeMonths && accountsId.contains( account.Id )) accountsId.remove( account.Id );
+        }
+        
+        return accountsId;
+    }
+
+    public Set<String> getAccountIdsWithoutOppLastFourMonths(List<Opportunity> opportunities, Set<String> accountsId){
+
+        Date lastFourMonths = System.now().date().addDays( -120 );
+
+        for( Opportunity opportunity : opportunities ){
+
+            if( opportunity.StageName == 'Negotiation/Review' && accountsId.contains( opportunity.AccountId )) accountsId.remove( opportunity.AccountId );
+
+            if( opportunity.StageName == 'Closed Won' && opportunity.CloseDate > lastFourMonths ){
+
+                if( accountsId.contains( opportunity.AccountId ) ) accountsId.remove( opportunity.AccountId );
+            }            
+
+        }
+
+        return accountsId;
+    }
 }
