@@ -22,7 +22,7 @@ public class AccountController {
         }
     }
 
-    @AuraEnabled(cacheable=true)
+    @AuraEnabled
     public static Account updateAccount( String name, String type, String accountNumber, String accountId ){
         try {
 

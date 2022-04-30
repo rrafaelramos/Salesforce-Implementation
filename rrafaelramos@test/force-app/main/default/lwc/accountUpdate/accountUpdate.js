@@ -32,9 +32,9 @@ export default class AccountUpdate extends LightningElement{
 
         if( data ){
             console.log( JSON.stringify( data ));
-            this.account = [...data];
+            this.account = {...data};
 
-            if( data ) this.typeValue = data.Type;
+            this.typeValue = data.Type;
 
         }
 
@@ -90,6 +90,10 @@ export default class AccountUpdate extends LightningElement{
 
         if( !type || type === DEFAULT_PLACEHOLDER ) return;
 
+        let selector = this.template.querySelector('lightning-input[data-name="documentValue"]');
+
+        if( selector ) selector.value = '';
+
         this.isDocumentType = DOCUMENT_OPTIONS.includes( type );
 
         this.typeValue = type;
@@ -109,7 +113,7 @@ export default class AccountUpdate extends LightningElement{
 
         if( this.typeValue === CNPJ && value.length > 14 ) event.target.value = event.target.value.slice(0, 14);
 
-        this.newAccountNumber = value;
+        this.newAccountNumber = event.target.value;
     }
 
     handleUpdateAccount( event ){
@@ -123,7 +127,7 @@ export default class AccountUpdate extends LightningElement{
         let parameters = {
             name: this.newAccountName
             , type: this.typeValue
-            , accountNumber: this.newAccountName
+            , accountNumber: this.newAccountNumber
             , accountId: this.recordId
         };
 
@@ -140,8 +144,7 @@ export default class AccountUpdate extends LightningElement{
 
     invalidFieldsToUpdate( ){
 
-        return ( !this.newName || this.newName.length === 0 
-                && this.typeValue === DEFAULT_PLACEHOLDER );        
+        return !this.newName && (!this.typeValue || this.typeValue === DEFAULT_PLACEHOLDER );        
     }
 
 }

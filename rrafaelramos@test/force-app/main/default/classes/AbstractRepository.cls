@@ -1,7 +1,7 @@
 /**
  * @author rrafaelramos
  */
-public virtual class AbstractRepository {
+public abstract class AbstractRepository {
 
     virtual
     public SObject save (SObject aggregate) {

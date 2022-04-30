@@ -12,12 +12,14 @@
             <lightning-combobox label="Tipo:" 
                 options={typePicklist}
                 onchange={handleTypeChange}
-                value={typeValue} > 
+                value={account.Type} >
             </lightning-combobox>
 
             <lightning-input if:true={isDocumentType}
                 label={typeValue}
-                onchange={handleAccountNumberChange}> 
+                onchange={handleAccountNumberChange}
+                value={account.AccountNumber} 
+                data-name="documentValue">
             </lightning-input>
 
         </div>
