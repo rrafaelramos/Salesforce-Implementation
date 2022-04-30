@@ -3,7 +3,7 @@
  */
 public class OpportunityEnricher {
     
-    public static final String PARTNER_OPP_ANOTATION = '– opp Parceiro';
+    public static final String PARTNER_OPP_ANOTATION = ' – opp Parceiro';
 
     public Opportunity withNameCloseDateAndStageName( Opportunity opportunity, Account account, Date closeDate, String stageName ){
 

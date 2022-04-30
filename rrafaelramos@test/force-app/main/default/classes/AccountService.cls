@@ -7,12 +7,14 @@ public class AccountService {
     public AccountEnricher enricher;
     public AccountRepository repository;
     public OpportunityService opportunityService;
+    public TaskService taskService;
 
     public AccountService(){
         this.filter = new AccountFilter();
         this.enricher = new AccountEnricher();
         this.repository = new AccountRepository();
         this.opportunityService = new OpportunityService();
+        this.taskService = new TaskService();
     }
 
     private static final String CPF = 'CPF';
@@ -84,14 +86,13 @@ public class AccountService {
         opportunityService.createOpportunityForPartnerAccount( partnerAccounts );
     }
 
-    // TODO
-    // public void verifyAndCreateTaskForFinalCustomer( List<Account> accounts ){
+    public void verifyAndCreateTaskForFinalCustomer( List<Account> accounts ){
 
-    //     List<Account> finalCustomerAccounts = getAccountByRecordTypeName( accounts, FINAL_CUSTOMER );
+        List<Account> finalCustomerAccounts = getAccountByRecordTypeName( accounts, FINAL_CUSTOMER );
 
-    //     if( finalCustomerAccounts == null || finalCustomerAccounts.isEmpty() ) return;
+        if( finalCustomerAccounts == null || finalCustomerAccounts.isEmpty() ) return;
 
-        //this.createTaskForFinalCustomer( finalCustomerAccounts );
-    // }
+        taskService.createTaskForFinalCustomer( finalCustomerAccounts );
+    }
 
 }

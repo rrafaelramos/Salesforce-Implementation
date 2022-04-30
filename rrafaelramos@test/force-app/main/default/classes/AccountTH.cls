@@ -32,22 +32,30 @@ public class AccountTH extends TriggerHandler {
     override
     public void beforeInsert() {
 
-        this.service.validateAccountNumber( this.newAccounts );
-
+        this.validateAccount( );
     }
 
     override
     public void beforeUpdate() {
 
-        this.service.validateAccountNumber( this.newAccounts );
-
+        this.validateAccount( );
     }
 
     override
     public void afterInsert() {
 
-        this.service.verifyAndCreateOpportunityForPartnerAccount( this.newAccounts );
-        //this.service.verifyAndCreateTaskForFinalCustomer( this.newAccounts );
+        this.verifyAndCreateRelatedEntitiesForAccount( );
+    }
+
+    private void validateAccount( ){
+
+        service.validateAccountNumber( this.newAccounts );
+    }
+
+    private void verifyAndCreateRelatedEntitiesForAccount( ){
+
+        service.verifyAndCreateOpportunityForPartnerAccount( this.newAccounts );
+        service.verifyAndCreateTaskForFinalCustomer( this.newAccounts );
     }
 
 }
