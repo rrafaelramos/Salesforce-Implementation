@@ -2,6 +2,7 @@ import { LightningElement, api, track, wire } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { getPicklistValues } from 'lightning/uiObjectInfoApi';
 import { getObjectInfo } from 'lightning/uiObjectInfoApi';
+import { updateRecord } from 'lightning/uiRecordApi';
 
 import getAccountInformation from '@salesforce/apex/AccountController.getAccountInformation';
 import updateAccount from '@salesforce/apex/AccountController.updateAccount';
@@ -37,6 +38,7 @@ export default class AccountUpdate extends LightningElement{
 
             this.account = {...data};
             this.typeValue = data.Type;
+            this.newAccountNumber = data.AccountNumber;
             this.isDocumentType = DOCUMENT_OPTIONS.includes( data.Type );
         }
 
@@ -160,6 +162,8 @@ export default class AccountUpdate extends LightningElement{
         };
 
         updateAccount( parameters ).then( result => {
+
+            updateRecord( { fields: { Id: this.recordId, Name: this.newAccountName, AccountNumber: this.newAccountNumber } });
 
             this.showToast('Sucesso' , SUCCESS_MESSAGE, 'success' );
 
