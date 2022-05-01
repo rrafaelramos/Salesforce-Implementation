@@ -21,14 +21,14 @@ export default class AccountUpdate extends LightningElement{
     @api recordId;
 
     @track account = [];
-
     typePicklist = [];
+
+    isDocumentType = false;
+    loader = false;
 
     newAccountName;
     newAccountNumber;
     typeValue;
-
-    isDocumentType = false;
 
     @wire( getAccountInformation,( { accountId: '$recordId' } ))
     wiredAccountInformation({ error, data }){
@@ -92,9 +92,7 @@ export default class AccountUpdate extends LightningElement{
 
         if( !type || type === DEFAULT_PLACEHOLDER ) return;
 
-        let selector = this.template.querySelector('lightning-input[data-name="documentValue"]');
-
-        if( selector ) selector.value = '';
+        this.clearDocumentValueField();
 
         this.isDocumentType = DOCUMENT_OPTIONS.includes( type );
 
@@ -118,6 +116,23 @@ export default class AccountUpdate extends LightningElement{
         this.newAccountNumber = event.target.value;
     }
 
+    handleAccountNumberBlur( event ){
+
+        if( !event ) return;
+
+        event.stopImmediatePropagation();
+
+        let value = event.target.value;
+
+        if( !value ) return;
+
+        if( this.typeValue === CPF && value.length != 11 ) this.clearDocumentValueField();
+
+        if( this.typeValue === CNPJ && value.length != 14 ) this.clearDocumentValueField();
+
+        if( !Number( value ) ) this.clearDocumentValueField();
+    }
+
     handleUpdateAccount( event ){
 
         if( !event ) return;
@@ -125,6 +140,17 @@ export default class AccountUpdate extends LightningElement{
         event.stopImmediatePropagation();
 
         if( this.invalidFieldsToUpdate( ) ) return;
+
+        if( DOCUMENT_OPTIONS.includes( this.typeValue ) ){
+
+            if( !Number( this.newAccountNumber ) ) {
+                this.clearDocumentValueField();
+                return;
+            }
+
+        }
+
+        this.loader = true;
 
         let parameters = {
             name: this.newAccountName
@@ -137,11 +163,11 @@ export default class AccountUpdate extends LightningElement{
 
             this.showToast('Sucesso' , SUCCESS_MESSAGE, 'success' );
 
-            this.isLoading = false;
+            this.loader = false;
 
         }).catch( error => {
             console.error( JSON.stringify(error) );
-            this.isLoading = false;
+            this.loader = false;
 
             if( error.body.message.includes( INVALID_ACCOUNT_NUMBER ) ){
             
@@ -156,6 +182,13 @@ export default class AccountUpdate extends LightningElement{
 
     invalidFieldsToUpdate( ){
         return !this.newName && (!this.typeValue || this.typeValue === DEFAULT_PLACEHOLDER );        
+    }
+
+    clearDocumentValueField( ){
+
+        let selector = this.template.querySelector('lightning-input[data-name="documentValue"]');
+        
+        if( selector ) selector.value = '';
     }
 
     showToast(title, message, variant) {

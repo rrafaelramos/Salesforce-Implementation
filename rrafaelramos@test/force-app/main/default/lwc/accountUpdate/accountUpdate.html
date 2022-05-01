@@ -1,7 +1,11 @@
 <template>
 
-    <lightning-card title="Informações da Conta" icon-name="custom:custom14">
+    <lightning-card title="Atualizar Conta" icon-name="custom:custom14">
         <div class="slds-var-m-around_medium">
+
+            <template if:true={loader}>
+                <lightning-spinner alternative-text="Loading" size="medium" class="spinnerClass" variant="brand"></lightning-spinner>
+            </template>
 
             <lightning-input 
                 label="Nome:" 
@@ -18,13 +22,14 @@
             <lightning-input if:true={isDocumentType}
                 label="Número:"
                 onchange={handleAccountNumberChange}
+                onblur={handleAccountNumberBlur}
                 value={account.AccountNumber} 
                 data-name="documentValue">
             </lightning-input>
 
         </div>
 
-        <div>
+        <div class="buttonContent">
             <lightning-button variant="brand" label="Salvar" onclick={handleUpdateAccount}></lightning-button>
         </div>
 
